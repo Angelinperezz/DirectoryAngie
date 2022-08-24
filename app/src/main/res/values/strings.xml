@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Reto Android</string>
+    <string name="Accept">Accept</string>
+    <string name="Decline">Cancel</string>
+    <string name="code">Code</string>
+    <string name="email">Email</string>
+    <string name="name">Name</string>
+    <string name="save">SAVE</string>
+    <string name="titulo">DIRECTORY</string>
+    <string name="crud">CRUD</string>
+</resources>
