@@ -4,6 +4,7 @@ import android.content.Intent;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
+
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -14,6 +15,9 @@ import retrofit2.Callback;
 import retrofit2.Response;
 import retrofit2.Retrofit;
 
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
 import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
@@ -31,6 +35,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     RecyclerView recyclerView;
     public static Adapter adapter;
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -42,12 +47,19 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         recyclerView = findViewById(R.id.recycler);
 
 
+
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 swipeRefreshLayout.setRefreshing(false);
+                if (UtilsNetwork.isOnline(MainActivity.this)) {
+                    getUsers();
 
-                getUsers();
+                } else {
+                    getUsersSQLite();
+
+                }
+
             }
         });
 
@@ -68,12 +80,51 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
     @Override
     protected void onResume() {
-        super.onResume();
-
-        getUsers();
+        if (UtilsNetwork.isOnline(this)) {
+            getUsers();
+            super.onResume();
+            System.out.println("Si hay internet");
+        } else {
+            getUsersSQLite();
+            super.onResume();
+            System.out.println("No estas conectado a internet");
+        }
     }
 
-    //Obtenemos los usuarios de la base de datos
+        public void getUsersSQLite() {
+            AdminSQLiteOpenHelper adminSQLiteOpenHelper = new AdminSQLiteOpenHelper(MainActivity.this);
+
+            Cursor cursor = adminSQLiteOpenHelper.consultUser();
+            List<Users> usersSQLite = new ArrayList<>();
+            Users users;
+
+
+            System.out.println("User size: " + cursor.getCount());
+
+            if (cursor.moveToFirst()) {
+
+                do {
+                    users = new Users();
+                    users.setId(String.valueOf(cursor.getInt(0)));
+                    users.setFullname(cursor.getString(1));
+                    users.setEmail(cursor.getString(2));
+                    users.setCode(Integer.parseInt(cursor.getString(3)));
+                    usersSQLite.add(users);
+
+                    populateUsers(usersSQLite);
+
+                    System.out.println(cursor.getString(1));
+                    System.out.println(users);
+
+
+                } while (cursor.moveToNext());
+            }
+            cursor.close();
+            return;
+        }
+
+
+    //Obtenemos los usuarios de la base de datos con retrofit
     public static void getUsers() {
 
         //Crear conexion al API
@@ -105,6 +156,8 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     //Si la respuesta es satisfactoria
                 } else {
                     List<Users> users = response.body();
+
+
                     populateUsers(users);
                 }
 
@@ -125,7 +178,9 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         for (Users user : usersList) {
             data.add(new Datos(user.getFullname(), user.getEmail(), user.getCode(), user.getId()));
+
         }
+
         adapter.update(data);
     }
 

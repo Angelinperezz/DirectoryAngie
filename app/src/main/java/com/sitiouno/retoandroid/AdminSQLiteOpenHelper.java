@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import java.util.ArrayList;
+
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
@@ -21,11 +23,14 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
     private static final String COL_1 = "FULLNAME";
     private static final String COL_2 = "EMAIL";
     private static final String COL_3 = "CODE";
+    private final Context context;
 
     //constructor
     public AdminSQLiteOpenHelper(@Nullable Context context) {
         super(context, DB_NAME, null, DB_VERSION);
+        this.context = context;
     }
+
 
     //Create database
     @Override
@@ -48,32 +53,46 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
         onCreate((sqLiteDatabase));
     }
 
-    public boolean registerUser(@NonNull String _id,
-                                @NonNull String fullname,
-                                @NonNull String email,
-                                @NonNull String code
-    ) throws SQLException {
-        SQLiteDatabase db = this.getWritableDatabase();
 
-        ContentValues values = new ContentValues();
+    private void closeDatabase(SQLiteDatabase db) {
+        try {
+            //db.close();
+            //Log.i("SQLite", "Closing database");
+        } catch (
+                SQLException e) {
+            e.printStackTrace();
+            Log.e("SQLite", "Error closing database");
+        }
+
+
+    }
+
+    public long registerUser(@NonNull String _id,
+                             @NonNull String fullname,
+                             @NonNull String email,
+                             @NonNull String code
+    ) throws SQLException {
+
+        long id = 0;
 
         try {
+            AdminSQLiteOpenHelper dbHelper = new AdminSQLiteOpenHelper(context);
+            SQLiteDatabase db = dbHelper.getWritableDatabase();
+
+            ContentValues values = new ContentValues();
             values.put(COL_0, _id);
             values.put(COL_1, fullname);
             values.put(COL_2, email);
             values.put(COL_3, code);
 
-            long result = db.insert(TABLE_NAME, null, values);
+            id = db.insert(TABLE_NAME, null, values);
 
-            closeDatabase(db);
-            return result != -1;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
+        } catch (Exception ex) {
+            ex.toString();
         }
+        return id;
     }
 
-    //Check is user is already registered
     public Cursor consultUser() throws SQLException {
         SQLiteDatabase db = this.getReadableDatabase();
 
@@ -94,8 +113,8 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
         closeDatabase(db);
         return null;
     }
-
     //UpdateUser
+
     public int updateUsers(
             @NonNull String _id,
             @NonNull String fullname,
@@ -126,16 +145,4 @@ public class AdminSQLiteOpenHelper extends SQLiteOpenHelper {
     }
 
 
-    private void closeDatabase(SQLiteDatabase db) {
-        try {
-            //db.close();
-            //Log.i("SQLite", "Closing database");
-        } catch (
-                SQLException e) {
-            e.printStackTrace();
-            Log.e("SQLite", "Error closing database");
-        }
-
-
-    }
 }

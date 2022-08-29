@@ -8,4 +8,5 @@
     <string name="save">SAVE</string>
     <string name="titulo">DIRECTORY</string>
     <string name="crud">CRUD</string>
+    <string name="common_message_noInternet">You are not connect to internet, please check your connection</string>
 </resources>

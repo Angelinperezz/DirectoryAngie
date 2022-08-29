@@ -58,10 +58,9 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolderAdapter> {
         );
     }
 
-    //Asignar los datos y asignar funciones a los metodos en el caso de que sea necesario
-    /*Asigna valores para cada elemento de la lista, obtiene un elemento del dataset segun su posicion
-     * reemplaza el contenido usando tales datos
-     */
+    /* Asignar los datos y asignar funciones a los metodos en el caso de que sea necesario
+     * Asigna valores para cada elemento de la lista, obtiene un elemento del dataset segun su posicion
+     * reemplaza el contenido usando tales datos */
 
     @Override
     public void onBindViewHolder(@NonNull MyViewHolderAdapter holder, int position) {
