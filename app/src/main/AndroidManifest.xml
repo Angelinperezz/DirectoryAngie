@@ -4,7 +4,7 @@
     package="com.sitiouno.retoandroid">
 
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -16,10 +16,7 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.RetoAndroid"
         tools:targetApi="31">
-        <activity
-            android:name=".MainActivity2"
-            android:exported="true">
-        </activity>
+
         <activity
             android:name=".MainActivity"
             android:exported="true">
@@ -29,6 +26,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".MainActivity2"/>
     </application>
 
 </manifest>

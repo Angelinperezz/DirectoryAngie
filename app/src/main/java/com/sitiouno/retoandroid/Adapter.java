@@ -39,6 +39,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolderAdapter> {
     public Adapter(Context context, ArrayList<Datos> data) {
         this.context = context;
         this.data = data;
+
         dataBuscador = new ArrayList<>();
         dataBuscador.addAll(data);
     }
@@ -90,7 +91,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolderAdapter> {
             holder.delete.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    alertDialog(id).show();
+                    deleteUserDialog(id).show();
 
                 }
             });
@@ -127,7 +128,7 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolderAdapter> {
         return data.size();
     }
 
-    private AlertDialog alertDialog(String id) {
+    private AlertDialog deleteUserDialog(String id) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(context);
         builder.setIcon(context.getDrawable(R.drawable.ic_baseline_restore_from_trash_24));
@@ -189,7 +190,6 @@ public class Adapter extends RecyclerView.Adapter<Adapter.MyViewHolderAdapter> {
         });
 
     }
-
 
     private void getUser(String id, String method) {
 

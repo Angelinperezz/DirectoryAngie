@@ -7,6 +7,7 @@ import android.content.DialogInterface;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -38,10 +39,7 @@ public class MainActivity2 extends AppCompatActivity {
     private String code;
     private String method;
 
-
-
     @Override
-
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main2);
@@ -70,13 +68,13 @@ public class MainActivity2 extends AppCompatActivity {
             case "GET":
                 button.setVisibility(View.GONE);
 
-                TextInputLayout tl1 = (TextInputLayout)findViewById(R.id.caja1);
+                TextInputLayout tl1 = (TextInputLayout) findViewById(R.id.caja1);
                 tl1.setHelperTextEnabled(false);
 
-                TextInputLayout tl2 = (TextInputLayout)findViewById(R.id.caja2);
+                TextInputLayout tl2 = (TextInputLayout) findViewById(R.id.caja2);
                 tl2.setHelperTextEnabled(false);
 
-                TextInputLayout tl3 = (TextInputLayout)findViewById(R.id.caja3);
+                TextInputLayout tl3 = (TextInputLayout) findViewById(R.id.caja3);
                 tl3.setHelperTextEnabled(false);
                 tl3.setCounterEnabled(false);
 
@@ -122,13 +120,11 @@ public class MainActivity2 extends AppCompatActivity {
         }
     }
 
-
     private void updateUser(String fullname, String email, int code, String id) {
 
         Retrofit retrofit = RetrofitClient.getRetrofitClient();
 
         Call<Users> updateUser = retrofit.create(UsersInterface.class).updateUser(fullname, email, code, id);
-
 
         updateUser.enqueue(new Callback<Users>() {
             @Override
@@ -183,12 +179,9 @@ public class MainActivity2 extends AppCompatActivity {
 
     private void createUser(Users user) {
 
-
         Retrofit retrofit = RetrofitClient.getRetrofitClient();
 
         Call<Users> call = retrofit.create(UsersInterface.class).saveUser(user);
-
-
 
         call.enqueue(new Callback<Users>() {
             @Override
