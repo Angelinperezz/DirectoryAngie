@@ -10,6 +10,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -35,7 +36,7 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
     RecyclerView recyclerView;
     public static Adapter adapter;
 
-
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -46,7 +47,13 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         swipeRefreshLayout = findViewById(R.id.swipe);
         recyclerView = findViewById(R.id.recycler);
 
+        setRecyclerView();
 
+        if (UtilsNetwork.isOnline(MainActivity.this)) {
+            getUsers();
+        } else {
+            getUsersSQLite();
+        }
 
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
@@ -54,17 +61,12 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 swipeRefreshLayout.setRefreshing(false);
                 if (UtilsNetwork.isOnline(MainActivity.this)) {
                     getUsers();
-
                 } else {
                     getUsersSQLite();
-
                 }
 
             }
         });
-
-        setRecyclerView();
-        getUsers();
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -74,33 +76,36 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                 startActivity(int1);
             }
         });
+
         txtBuscar.setOnQueryTextListener(this);
 
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     protected void onResume() {
+        super.onResume();
+
         if (UtilsNetwork.isOnline(this)) {
             getUsers();
-            super.onResume();
             System.out.println("Si hay internet");
         } else {
             getUsersSQLite();
-            super.onResume();
             System.out.println("No estas conectado a internet");
         }
     }
 
-        public void getUsersSQLite() {
-            AdminSQLiteOpenHelper adminSQLiteOpenHelper = new AdminSQLiteOpenHelper(MainActivity.this);
+    //Get users of SQLite
+    public void getUsersSQLite() {
+        AdminSQLiteOpenHelper adminSQLiteOpenHelper = new AdminSQLiteOpenHelper(MainActivity.this);
 
-            Cursor cursor = adminSQLiteOpenHelper.consultUser();
-            List<Users> usersSQLite = new ArrayList<>();
-            Users users;
+        Cursor cursor = adminSQLiteOpenHelper.consultUser();
+        List<Users> usersSQLite = new ArrayList<>();
+        Users users;
 
-
-            System.out.println("User size: " + cursor.getCount());
-
+        if (cursor == null) {
+            Toast.makeText(this, "Don't users exists", Toast.LENGTH_SHORT).show();
+        } else {
             if (cursor.moveToFirst()) {
 
                 do {
@@ -111,18 +116,15 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     users.setCode(Integer.parseInt(cursor.getString(3)));
                     usersSQLite.add(users);
 
-                    populateUsers(usersSQLite);
-
-                    System.out.println(cursor.getString(1));
-                    System.out.println(users);
-
-
                 } while (cursor.moveToNext());
             }
+
+            populateUsers(usersSQLite);
             cursor.close();
-            return;
         }
 
+
+    }
 
     //Obtenemos los usuarios de la base de datos con retrofit
     public static void getUsers() {
@@ -156,8 +158,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
                     //Si la respuesta es satisfactoria
                 } else {
                     List<Users> users = response.body();
-
-
                     populateUsers(users);
                 }
 
@@ -178,7 +178,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
 
         for (Users user : usersList) {
             data.add(new Datos(user.getFullname(), user.getEmail(), user.getCode(), user.getId()));
-
         }
 
         adapter.update(data);
@@ -192,7 +191,6 @@ public class MainActivity extends AppCompatActivity implements SearchView.OnQuer
         adapter = new Adapter(MainActivity.this, new ArrayList<>());
         recyclerView.setAdapter(adapter);
     }
-
 
     @Override
     public boolean onQueryTextSubmit(String s) {
